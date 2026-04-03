@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Sidebar from "@/components/layout/Sidebar";
 import TopBar from "@/components/layout/TopBar";
-import { createClient } from "@/lib/supabase/client";
+import { createClient, isSupabaseConfigured } from "@/lib/supabase/client";
 import { useUserStore } from "@/lib/store/user";
 
 export default function MainLayout({
@@ -17,19 +17,41 @@ export default function MainLayout({
   const closeSidebar = useCallback(() => setSidebarOpen(false), []);
 
   useEffect(() => {
+    if (!isSupabaseConfigured()) {
+      setProfile({
+        id: "demo",
+        email: "scholar@loci.app",
+        display_name: "The Archivist",
+        avatar_url: null,
+      });
+      return;
+    }
+
     const supabase = createClient();
 
     async function loadProfile() {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (user) {
+      try {
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+        if (user) {
+          setProfile({
+            id: user.id,
+            email: user.email || "",
+            display_name:
+              user.user_metadata?.display_name ||
+              user.email?.split("@")[0] ||
+              "Scholar",
+            avatar_url: user.user_metadata?.avatar_url || null,
+          });
+        }
+      } catch {
+        // Supabase unavailable — use demo profile
         setProfile({
-          id: user.id,
-          email: user.email || "",
-          display_name:
-            user.user_metadata?.display_name || user.email?.split("@")[0] || "Scholar",
-          avatar_url: user.user_metadata?.avatar_url || null,
+          id: "demo",
+          email: "scholar@loci.app",
+          display_name: "The Archivist",
+          avatar_url: null,
         });
       }
     }
