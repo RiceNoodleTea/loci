@@ -1,128 +1,137 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
-import { Trophy } from "lucide-react";
+import { getAvatarIcon } from "@/lib/avatar-icons";
 
-interface LeaderboardMember {
+export interface LeaderboardMember {
   id: string;
   name: string;
-  studyMinutes: number;
-  particlesEarned: number;
+  avatar: string;
+  weeklyStudyMinutes: number;
+  isStudying: boolean;
+  currentSessionStart?: string;
 }
 
 interface LeaderboardProps {
   members: LeaderboardMember[];
-  period: "weekly" | "monthly";
   currentUserId?: string;
 }
 
-function formatStudyTime(minutes: number) {
+function formatStudyTime(minutes: number): string {
   if (minutes < 60) return `${minutes}m`;
   const h = Math.floor(minutes / 60);
   const m = minutes % 60;
   return m > 0 ? `${h}h ${m}m` : `${h}h`;
 }
 
-const RANK_STYLES: Record<number, { bg: string; text: string; ring: string }> = {
-  1: { bg: "bg-amber-100", text: "text-amber-700", ring: "ring-amber-300" },
-  2: { bg: "bg-gray-100", text: "text-gray-500", ring: "ring-gray-300" },
-  3: { bg: "bg-orange-100", text: "text-orange-700", ring: "ring-orange-300" },
-};
+function MemberCard({
+  member,
+  isCurrentUser,
+}: {
+  member: LeaderboardMember;
+  isCurrentUser: boolean;
+}) {
+  const [liveMinutes, setLiveMinutes] = useState(member.weeklyStudyMinutes);
+
+  useEffect(() => {
+    if (!member.isStudying || !member.currentSessionStart) {
+      setLiveMinutes(member.weeklyStudyMinutes);
+      return;
+    }
+    const update = () => {
+      const elapsed = Math.floor(
+        (Date.now() - new Date(member.currentSessionStart!).getTime()) / 60000
+      );
+      setLiveMinutes(member.weeklyStudyMinutes + elapsed);
+    };
+    update();
+    const interval = setInterval(update, 10000);
+    return () => clearInterval(interval);
+  }, [member.isStudying, member.currentSessionStart, member.weeklyStudyMinutes]);
+
+  const AvatarIcon = getAvatarIcon(member.avatar);
+
+  return (
+    <div
+      className={cn(
+        "flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all",
+        member.isStudying
+          ? "border-olive bg-olive/5 shadow-card"
+          : "border-border bg-parchment/40 opacity-50 grayscale-[30%]"
+      )}
+    >
+      {/* Avatar */}
+      <div
+        className={cn(
+          "w-12 h-12 rounded-full flex items-center justify-center",
+          member.isStudying
+            ? "bg-olive text-white"
+            : "bg-gray-300 text-white"
+        )}
+      >
+        {AvatarIcon ? (
+          <AvatarIcon size={22} />
+        ) : (
+          <span className="font-serif font-bold text-lg">
+            {member.name.charAt(0).toUpperCase()}
+          </span>
+        )}
+      </div>
+
+      {/* Name */}
+      <p className="text-sm font-semibold text-charcoal text-center truncate w-full">
+        {member.name}
+        {isCurrentUser && (
+          <span className="text-[10px] text-muted font-normal block">
+            (you)
+          </span>
+        )}
+      </p>
+
+      {/* Timer */}
+      <div
+        className={cn(
+          "px-3 py-1 rounded-full text-xs font-mono font-medium",
+          member.isStudying
+            ? "bg-olive/10 text-olive"
+            : "bg-gray-100 text-muted"
+        )}
+      >
+        {formatStudyTime(liveMinutes)}
+      </div>
+
+      {/* Active indicator */}
+      {member.isStudying && (
+        <span className="relative flex h-2 w-2">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500" />
+        </span>
+      )}
+    </div>
+  );
+}
 
 export default function Leaderboard({
   members,
-  period: initialPeriod,
   currentUserId = "current",
 }: LeaderboardProps) {
-  const [period, setPeriod] = useState<"weekly" | "monthly">(initialPeriod);
-
-  const sorted = [...members].sort(
-    (a, b) => b.studyMinutes - a.studyMinutes
-  );
+  const sorted = [...members].sort((a, b) => {
+    if (a.isStudying && !b.isStudying) return -1;
+    if (!a.isStudying && b.isStudying) return 1;
+    return b.weeklyStudyMinutes - a.weeklyStudyMinutes;
+  });
 
   return (
     <div>
-      <div className="flex items-center gap-1 bg-parchment-dark rounded-lg p-1 mb-5 w-fit">
-        {(["weekly", "monthly"] as const).map((p) => (
-          <button
-            key={p}
-            onClick={() => setPeriod(p)}
-            className={cn(
-              "px-4 py-1.5 rounded-md text-sm font-medium transition-colors capitalize",
-              period === p
-                ? "bg-white text-charcoal shadow-card"
-                : "text-muted hover:text-charcoal"
-            )}
-          >
-            {p}
-          </button>
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        {sorted.map((member) => (
+          <MemberCard
+            key={member.id}
+            member={member}
+            isCurrentUser={member.id === currentUserId}
+          />
         ))}
-      </div>
-
-      <div className="space-y-2">
-        {sorted.map((member, i) => {
-          const rank = i + 1;
-          const isTopThree = rank <= 3;
-          const style = RANK_STYLES[rank];
-          const isCurrentUser = member.id === currentUserId;
-
-          return (
-            <div
-              key={member.id}
-              className={cn(
-                "flex items-center gap-3 p-3 rounded-xl transition-colors",
-                isCurrentUser && "bg-olive-light",
-                !isCurrentUser && "hover:bg-parchment"
-              )}
-            >
-              {isTopThree && style ? (
-                <div
-                  className={cn(
-                    "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold ring-2",
-                    style.bg,
-                    style.text,
-                    style.ring
-                  )}
-                >
-                  {rank === 1 ? (
-                    <Trophy size={14} />
-                  ) : (
-                    rank
-                  )}
-                </div>
-              ) : (
-                <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold text-muted bg-parchment-dark">
-                  {rank}
-                </div>
-              )}
-
-              <div className="w-9 h-9 rounded-full bg-olive flex items-center justify-center text-white text-sm font-bold shrink-0">
-                {member.name.charAt(0).toUpperCase()}
-              </div>
-
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-charcoal truncate">
-                  {member.name}
-                  {isCurrentUser && (
-                    <span className="text-xs text-muted font-normal ml-1.5">
-                      (you)
-                    </span>
-                  )}
-                </p>
-              </div>
-
-              <div className="text-right shrink-0">
-                <p className="text-sm font-semibold text-charcoal">
-                  {formatStudyTime(member.studyMinutes)}
-                </p>
-                <p className="text-[11px] text-muted">
-                  {member.particlesEarned} particles
-                </p>
-              </div>
-            </div>
-          );
-        })}
       </div>
     </div>
   );

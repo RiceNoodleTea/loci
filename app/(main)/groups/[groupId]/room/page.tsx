@@ -7,12 +7,12 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 
 const MOCK_PARTICIPANTS = [
-  { id: "u1", name: "Aria Chen", isActive: true, studyingMinutes: 42 },
-  { id: "u2", name: "Marcus Bell", isActive: true, studyingMinutes: 18 },
-  { id: "u3", name: "Priya Sharma", isActive: false, studyingMinutes: 0 },
-  { id: "u4", name: "James Wright", isActive: true, studyingMinutes: 7 },
-  { id: "u5", name: "Sofia Lopez", isActive: true, studyingMinutes: 55 },
-  { id: "u6", name: "Liam Nguyen", isActive: false, studyingMinutes: 0 },
+  { id: "u1", name: "Aria Chen", isActive: true, personalMinutes: 42 },
+  { id: "u2", name: "Marcus Bell", isActive: true, personalMinutes: 18 },
+  { id: "u3", name: "Priya Sharma", isActive: false, personalMinutes: 0 },
+  { id: "u4", name: "James Wright", isActive: true, personalMinutes: 7 },
+  { id: "u5", name: "Sofia Lopez", isActive: true, personalMinutes: 55 },
+  { id: "u6", name: "Liam Nguyen", isActive: false, personalMinutes: 0 },
 ];
 
 export default function StudyRoomPage() {
@@ -32,7 +32,9 @@ export default function StudyRoomPage() {
 
       <div className="card">
         <StudyRoom
+          title="Study Session"
           participants={MOCK_PARTICIPANTS}
+          roomCreatedAt={new Date(Date.now() - 30 * 60000).toISOString()}
           onJoin={() => setIsInRoom(true)}
           onLeave={() => setIsInRoom(false)}
           isInRoom={isInRoom}

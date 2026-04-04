@@ -34,6 +34,7 @@ export interface Element {
   neutrons: number;
   electrons: number;
   category: string;
+  commonIsotopes: number[];
 }
 
 export interface Atom {

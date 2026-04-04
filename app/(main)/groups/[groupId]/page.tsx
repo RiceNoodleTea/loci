@@ -6,57 +6,87 @@ import { useRouter, useParams } from "next/navigation";
 import {
   MessageSquare,
   Trophy,
-  BookOpen,
   FlaskConical,
-  Vote,
-  Copy,
+  ArrowLeft,
   Users,
-  Check,
 } from "lucide-react";
-import ChatWindow from "@/components/socials/ChatWindow";
-import Leaderboard from "@/components/socials/Leaderboard";
-import StudyRoom from "@/components/socials/StudyRoom";
-import VotePanel from "@/components/socials/VotePanel";
+import PostFeed from "@/components/socials/PostFeed";
+import VoteBar from "@/components/socials/VoteBar";
+import StudyRoom, {
+  CreateStudyRoomButton,
+  type StudyRoomParticipant,
+} from "@/components/socials/StudyRoom";
+import Leaderboard, {
+  type LeaderboardMember,
+} from "@/components/socials/Leaderboard";
+import LabInline from "@/components/socials/LabInline";
 
 const TABS = [
   { id: "chat", label: "Chat", icon: MessageSquare },
   { id: "leaderboard", label: "Leaderboard", icon: Trophy },
-  { id: "study-room", label: "Study Room", icon: BookOpen },
   { id: "lab", label: "Lab", icon: FlaskConical },
-  { id: "vote", label: "Vote", icon: Vote },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
 
 const MOCK_GROUP = {
   name: "Organic Chemistry Squad",
-  memberCount: 12,
+  memberCount: 6,
   inviteCode: "CHEM42",
 };
 
-const MOCK_LEADERBOARD = [
-  { id: "u1", name: "Aria Chen", studyMinutes: 340, particlesEarned: 85 },
-  { id: "current", name: "You", studyMinutes: 290, particlesEarned: 72 },
-  { id: "u2", name: "Marcus Bell", studyMinutes: 265, particlesEarned: 66 },
-  { id: "u3", name: "Priya Sharma", studyMinutes: 210, particlesEarned: 52 },
-  { id: "u4", name: "James Wright", studyMinutes: 180, particlesEarned: 45 },
-  { id: "u5", name: "Sofia Lopez", studyMinutes: 155, particlesEarned: 38 },
+const MOCK_LEADERBOARD: LeaderboardMember[] = [
+  {
+    id: "u1",
+    name: "Aria Chen",
+    avatar: "flask",
+    weeklyStudyMinutes: 340,
+    isStudying: true,
+    currentSessionStart: new Date(Date.now() - 42 * 60000).toISOString(),
+  },
+  {
+    id: "current",
+    name: "You",
+    avatar: "rocket",
+    weeklyStudyMinutes: 290,
+    isStudying: true,
+    currentSessionStart: new Date(Date.now() - 18 * 60000).toISOString(),
+  },
+  {
+    id: "u2",
+    name: "Marcus Bell",
+    avatar: "atom",
+    weeklyStudyMinutes: 265,
+    isStudying: false,
+  },
+  {
+    id: "u3",
+    name: "Priya Sharma",
+    avatar: "microscope",
+    weeklyStudyMinutes: 210,
+    isStudying: false,
+  },
+  {
+    id: "u4",
+    name: "James Wright",
+    avatar: "dna",
+    weeklyStudyMinutes: 180,
+    isStudying: true,
+    currentSessionStart: new Date(Date.now() - 7 * 60000).toISOString(),
+  },
+  {
+    id: "u5",
+    name: "Sofia Lopez",
+    avatar: "telescope",
+    weeklyStudyMinutes: 155,
+    isStudying: false,
+  },
 ];
 
-const MOCK_PARTICIPANTS = [
-  { id: "u1", name: "Aria Chen", isActive: true, studyingMinutes: 42 },
-  { id: "u2", name: "Marcus Bell", isActive: true, studyingMinutes: 18 },
-  { id: "u3", name: "Priya Sharma", isActive: false, studyingMinutes: 0 },
-  { id: "u4", name: "James Wright", isActive: true, studyingMinutes: 7 },
-];
-
-const MOCK_ELEMENTS = [
-  { symbol: "H", name: "Hydrogen", atomicNumber: 1, protons: 1, neutrons: 0, electrons: 1 },
-  { symbol: "He", name: "Helium", atomicNumber: 2, protons: 2, neutrons: 2, electrons: 2 },
-  { symbol: "Li", name: "Lithium", atomicNumber: 3, protons: 3, neutrons: 4, electrons: 3 },
-  { symbol: "C", name: "Carbon", atomicNumber: 6, protons: 6, neutrons: 6, electrons: 6 },
-  { symbol: "N", name: "Nitrogen", atomicNumber: 7, protons: 7, neutrons: 7, electrons: 7 },
-  { symbol: "O", name: "Oxygen", atomicNumber: 8, protons: 8, neutrons: 8, electrons: 8 },
+const MOCK_ROOM_PARTICIPANTS: StudyRoomParticipant[] = [
+  { id: "u1", name: "Aria Chen", isActive: true, personalMinutes: 42 },
+  { id: "current", name: "You", isActive: true, personalMinutes: 18 },
+  { id: "u4", name: "James Wright", isActive: true, personalMinutes: 7 },
 ];
 
 export default function GroupHubPage() {
@@ -65,62 +95,59 @@ export default function GroupHubPage() {
   const groupId = params.groupId as string;
 
   const [activeTab, setActiveTab] = useState<TabId>("chat");
+  const [currentVote, setCurrentVote] = useState<string | null>(null);
   const [isInRoom, setIsInRoom] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const [activeRoom, setActiveRoom] = useState<{
+    title: string;
+    createdAt: string;
+  } | null>({
+    title: "Organic Chemistry Review",
+    createdAt: new Date(Date.now() - 45 * 60000).toISOString(),
+  });
 
-  function handleCopyCode() {
-    navigator.clipboard.writeText(MOCK_GROUP.inviteCode);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  }
-
-  function handleTabClick(tabId: TabId) {
-    if (tabId === "lab") {
-      router.push(`/groups/${groupId}/lab`);
-      return;
-    }
-    setActiveTab(tabId);
+  function handleCreateRoom(title: string) {
+    setActiveRoom({ title, createdAt: new Date().toISOString() });
   }
 
   return (
-    <div className="max-w-4xl mx-auto">
+    <div className="max-w-4xl mx-auto flex flex-col h-[calc(100vh-80px)]">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
-        <div className="flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-olive flex items-center justify-center text-white font-serif font-bold text-xl">
-            {MOCK_GROUP.name.charAt(0)}
-          </div>
-          <div>
-            <h1 className="font-serif font-bold text-xl text-charcoal">
-              {MOCK_GROUP.name}
-            </h1>
-            <p className="flex items-center gap-3 text-sm text-muted">
-              <span className="flex items-center gap-1">
-                <Users size={14} /> {MOCK_GROUP.memberCount} members
-              </span>
-              <button
-                onClick={handleCopyCode}
-                className="flex items-center gap-1 hover:text-charcoal transition-colors"
-              >
-                {copied ? <Check size={13} /> : <Copy size={13} />}
-                {copied ? "Copied!" : MOCK_GROUP.inviteCode}
-              </button>
-            </p>
-          </div>
+      <div className="flex items-center gap-3 mb-4 shrink-0">
+        <button
+          onClick={() => router.push("/groups")}
+          className="p-2 rounded-lg hover:bg-parchment transition-colors text-muted hover:text-charcoal"
+        >
+          <ArrowLeft size={18} />
+        </button>
+
+        <div className="w-10 h-10 rounded-full bg-olive flex items-center justify-center text-white font-serif font-bold text-lg">
+          {MOCK_GROUP.name.charAt(0)}
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <button
+            onClick={() => router.push(`/groups/${groupId}/info`)}
+            className="font-serif font-bold text-lg text-charcoal hover:text-olive transition-colors text-left"
+          >
+            {MOCK_GROUP.name}
+          </button>
+          <p className="flex items-center gap-1 text-xs text-muted">
+            <Users size={12} /> {MOCK_GROUP.memberCount} members
+          </p>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 bg-parchment-dark rounded-xl p-1 mb-6 overflow-x-auto">
+      <div className="flex gap-1 bg-parchment-dark rounded-xl p-1 mb-4 shrink-0">
         {TABS.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
-              onClick={() => handleTabClick(tab.id)}
+              onClick={() => setActiveTab(tab.id)}
               className={cn(
-                "flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors",
+                "flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-colors flex-1 justify-center",
                 isActive
                   ? "bg-white text-charcoal shadow-card"
                   : "text-muted hover:text-charcoal"
@@ -134,35 +161,51 @@ export default function GroupHubPage() {
       </div>
 
       {/* Tab Content */}
-      <div className="card">
+      <div className="flex-1 min-h-0 overflow-hidden">
         {activeTab === "chat" && (
-          <ChatWindow groupId={groupId} currentUserId="current" />
+          <div className="h-full overflow-y-auto space-y-3 pb-4">
+            {/* Vote bar */}
+            <VoteBar
+              currentVote={currentVote}
+              onVote={(sym) => setCurrentVote(sym)}
+            />
+
+            {/* Active study room (pinned) */}
+            {activeRoom && (
+              <StudyRoom
+                title={activeRoom.title}
+                participants={MOCK_ROOM_PARTICIPANTS}
+                roomCreatedAt={activeRoom.createdAt}
+                onJoin={() => setIsInRoom(true)}
+                onLeave={() => setIsInRoom(false)}
+                onClose={() => setActiveRoom(null)}
+                isInRoom={isInRoom}
+              />
+            )}
+
+            {/* Create study room button (shown if no active room) */}
+            {!activeRoom && (
+              <CreateStudyRoomButton onCreate={handleCreateRoom} />
+            )}
+
+            {/* Post feed */}
+            <PostFeed groupId={groupId} currentUserId="current" />
+          </div>
         )}
 
         {activeTab === "leaderboard" && (
-          <Leaderboard
-            members={MOCK_LEADERBOARD}
-            period="weekly"
-            currentUserId="current"
-          />
+          <div className="h-full overflow-y-auto pb-4">
+            <Leaderboard
+              members={MOCK_LEADERBOARD}
+              currentUserId="current"
+            />
+          </div>
         )}
 
-        {activeTab === "study-room" && (
-          <StudyRoom
-            participants={MOCK_PARTICIPANTS}
-            onJoin={() => setIsInRoom(true)}
-            onLeave={() => setIsInRoom(false)}
-            isInRoom={isInRoom}
-            compact
-          />
-        )}
-
-        {activeTab === "vote" && (
-          <VotePanel
-            options={MOCK_ELEMENTS}
-            currentVote={null}
-            onVote={(symbol) => alert(`Voted for ${symbol}!`)}
-          />
+        {activeTab === "lab" && (
+          <div className="h-full">
+            <LabInline />
+          </div>
         )}
       </div>
     </div>
