@@ -47,27 +47,21 @@ const RANK_COLORS = [
   "bg-orange-100 text-orange-700",
 ];
 
-function GroupList({
-  groups,
-  compact,
-}: {
-  groups: GroupInfo[];
-  compact?: boolean;
-}) {
+function GroupList({ groups, compact }: { groups: GroupInfo[]; compact?: boolean }) {
   return (
-    <div className={cn("space-y-1 overflow-y-auto", compact ? "max-h-full" : "max-h-[200px]")}>
+    <div className="space-y-0.5 overflow-y-auto h-full">
       {groups.map((g) => (
         <div
           key={g.id}
           className={cn(
-            "flex items-center gap-2 rounded-lg hover:bg-parchment/60 transition-colors cursor-pointer",
-            compact ? "px-1.5 py-1.5" : "px-2 py-2"
+            "flex items-center gap-1.5 rounded-lg hover:bg-parchment/60 transition-colors cursor-pointer",
+            compact ? "px-1 py-1" : "px-1.5 py-1.5"
           )}
         >
           <div
             className={cn(
               "rounded-full bg-olive flex items-center justify-center text-white font-serif font-bold shrink-0",
-              compact ? "w-7 h-7 text-xs" : "w-8 h-8 text-sm"
+              compact ? "w-6 h-6 text-[10px]" : "w-7 h-7 text-xs"
             )}
           >
             {g.name.charAt(0)}
@@ -76,18 +70,20 @@ function GroupList({
             <p
               className={cn(
                 "font-semibold text-charcoal truncate",
-                compact ? "text-xs" : "text-sm"
+                compact ? "text-[10px]" : "text-xs"
               )}
             >
               {g.name}
             </p>
-            <p className="text-[10px] text-muted">
-              <Users size={10} className="inline mr-0.5" />
-              {g.memberCount}
-            </p>
+            {!compact && (
+              <p className="text-[9px] text-muted">
+                <Users size={9} className="inline mr-0.5" />
+                {g.memberCount}
+              </p>
+            )}
           </div>
           {g.unread > 0 && (
-            <span className="shrink-0 bg-olive text-white text-[10px] font-bold rounded-full w-5 h-5 flex items-center justify-center">
+            <span className="shrink-0 bg-olive text-white text-[8px] font-bold rounded-full w-4 h-4 flex items-center justify-center">
               {g.unread}
             </span>
           )}
@@ -99,25 +95,25 @@ function GroupList({
 
 function MiniLeaderboard({ entries }: { entries: LeaderEntry[] }) {
   return (
-    <div className="space-y-1.5">
-      <p className="text-[10px] text-muted uppercase tracking-wider font-semibold flex items-center gap-1">
-        <Trophy size={10} />
+    <div className="space-y-1">
+      <p className="text-[9px] text-muted uppercase tracking-wider font-semibold flex items-center gap-1">
+        <Trophy size={9} />
         Weekly Top 3
       </p>
       {entries.map((e, i) => (
-        <div key={e.rank} className="flex items-center gap-2">
+        <div key={e.rank} className="flex items-center gap-1.5">
           <span
             className={cn(
-              "w-5 h-5 rounded-full flex items-center justify-center text-[10px] font-bold",
+              "w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-bold",
               RANK_COLORS[i] || "bg-parchment-dark text-muted"
             )}
           >
             {e.rank}
           </span>
-          <span className="text-xs text-charcoal flex-1 truncate">
+          <span className="text-[11px] text-charcoal flex-1 truncate">
             {e.name}
           </span>
-          <span className="text-xs text-muted font-medium">{e.hours}h</span>
+          <span className="text-[11px] text-muted font-medium">{e.hours}h</span>
         </div>
       ))}
     </div>
@@ -138,23 +134,23 @@ function LabProgress({
   const pct = Math.min((collected / needed) * 100, 100);
   return (
     <div>
-      <p className="text-[10px] text-muted uppercase tracking-wider font-semibold flex items-center gap-1 mb-1.5">
-        <FlaskConical size={10} />
+      <p className="text-[9px] text-muted uppercase tracking-wider font-semibold flex items-center gap-1 mb-1">
+        <FlaskConical size={9} />
         Lab Progress
       </p>
-      <div className="flex items-center gap-2">
-        <div className="w-8 h-8 rounded-lg bg-olive-light flex items-center justify-center">
-          <span className="text-sm font-bold text-olive">{symbol}</span>
+      <div className="flex items-center gap-1.5">
+        <div className="w-7 h-7 rounded-lg bg-olive-light flex items-center justify-center">
+          <span className="text-xs font-bold text-olive">{symbol}</span>
         </div>
         <div className="flex-1 min-w-0">
-          <p className="text-xs text-charcoal font-medium">{element}</p>
-          <div className="w-full h-1.5 bg-parchment-dark rounded-full mt-1">
+          <p className="text-[10px] text-charcoal font-medium">{element}</p>
+          <div className="w-full h-1 bg-parchment-dark rounded-full mt-0.5">
             <div
               className="h-full bg-olive rounded-full transition-all"
               style={{ width: `${pct}%` }}
             />
           </div>
-          <p className="text-[10px] text-muted mt-0.5">
+          <p className="text-[8px] text-muted mt-0.5">
             {collected}/{needed} particles
           </p>
         </div>
@@ -169,18 +165,18 @@ export default function StudyGroup({ size }: StudyGroupProps) {
   if (size === "small") {
     return (
       <div className="card flex flex-col h-full">
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-sm font-serif font-semibold text-charcoal">
+        <div className="flex items-center justify-between mb-1.5 shrink-0">
+          <h2 className="text-xs font-serif font-semibold text-charcoal">
             Study Groups
           </h2>
           {totalUnread > 0 && (
-            <span className="flex items-center gap-0.5 text-[10px] text-olive">
-              <MessageCircle size={10} />
+            <span className="flex items-center gap-0.5 text-[9px] text-olive">
+              <MessageCircle size={9} />
               {totalUnread}
             </span>
           )}
         </div>
-        <div className="flex-1 overflow-hidden">
+        <div className="flex-1 overflow-hidden min-h-0">
           <GroupList groups={MOCK_GROUPS} compact />
         </div>
       </div>
@@ -190,19 +186,19 @@ export default function StudyGroup({ size }: StudyGroupProps) {
   if (size === "large") {
     return (
       <div className="card flex flex-col h-full">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-base font-serif font-semibold text-charcoal">
+        <div className="flex items-center justify-between mb-2 shrink-0">
+          <h2 className="text-sm font-serif font-semibold text-charcoal">
             Study Groups
           </h2>
           {totalUnread > 0 && (
-            <span className="flex items-center gap-1 text-xs text-olive">
-              <MessageCircle size={12} />
+            <span className="flex items-center gap-1 text-[10px] text-olive">
+              <MessageCircle size={10} />
               {totalUnread} new
             </span>
           )}
         </div>
-        <div className="flex-1 grid grid-cols-3 gap-4">
-          <div className="overflow-hidden">
+        <div className="flex-1 grid grid-cols-3 gap-3 min-h-0 overflow-hidden">
+          <div className="overflow-y-auto min-h-0">
             <GroupList groups={MOCK_GROUPS} />
           </div>
           <div>
@@ -224,19 +220,19 @@ export default function StudyGroup({ size }: StudyGroupProps) {
   // Medium
   return (
     <div className="card flex flex-col h-full">
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-base font-serif font-semibold text-charcoal">
+      <div className="flex items-center justify-between mb-2 shrink-0">
+        <h2 className="text-sm font-serif font-semibold text-charcoal">
           Study Groups
         </h2>
         {totalUnread > 0 && (
-          <span className="flex items-center gap-1 text-xs text-olive">
-            <MessageCircle size={12} />
+          <span className="flex items-center gap-1 text-[10px] text-olive">
+            <MessageCircle size={10} />
             {totalUnread} new
           </span>
         )}
       </div>
-      <div className="flex-1 grid grid-cols-2 gap-3">
-        <div className="overflow-hidden">
+      <div className="flex-1 grid grid-cols-2 gap-2 min-h-0 overflow-hidden">
+        <div className="overflow-y-auto min-h-0">
           <GroupList groups={MOCK_GROUPS} />
         </div>
         <div>

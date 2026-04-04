@@ -17,16 +17,15 @@ const CIRCUMFERENCE = 2 * Math.PI * RING_RADIUS;
 
 function TimerRing({
   progress,
-  compact,
+  ringClass,
 }: {
   progress: number;
-  compact?: boolean;
+  ringClass: string;
 }) {
   const offset = CIRCUMFERENCE * (1 - progress);
-  const wrapSize = compact ? "w-[110px] h-[110px]" : "w-[140px] h-[140px]";
   return (
     <svg
-      className={cn("shrink-0 -rotate-90", wrapSize)}
+      className={cn("shrink-0 -rotate-90", ringClass)}
       viewBox="0 0 128 128"
     >
       <circle
@@ -55,12 +54,14 @@ function TimerRing({
 
 function ClockTimer({
   active,
-  compact,
+  ringClass,
+  textClass,
   grayed,
   onActivate,
 }: {
   active: boolean;
-  compact?: boolean;
+  ringClass: string;
+  textClass: string;
   grayed?: boolean;
   onActivate?: () => void;
 }) {
@@ -94,7 +95,7 @@ function ClockTimer({
   };
 
   const wrapClass = grayed
-    ? "opacity-40 pointer-events-none cursor-pointer"
+    ? "opacity-40 cursor-pointer"
     : "";
 
   return (
@@ -102,29 +103,29 @@ function ClockTimer({
       className={cn("flex flex-col items-center", wrapClass)}
       onClick={grayed ? onActivate : undefined}
     >
-      <p className="label-caps mb-2 text-[10px]">Clock</p>
+      <p className="label-caps mb-1 text-[10px]">Clock</p>
       <div className="relative">
-        <TimerRing progress={0} compact={compact} />
+        <TimerRing progress={0} ringClass={ringClass} />
         <span
           className={cn(
             "absolute inset-0 flex items-center justify-center font-serif text-charcoal tabular-nums",
-            compact ? "text-3xl" : "text-4xl"
+            textClass
           )}
         >
           {formatTime(elapsed)}
         </span>
       </div>
       {active && (
-        <div className="flex gap-2 mt-3">
+        <div className="flex gap-2 mt-2">
           <button
             onClick={() => setRunning((r) => !r)}
-            className="btn-primary flex items-center gap-1.5 text-xs px-3 py-1.5"
+            className="btn-primary flex items-center gap-1 text-xs px-2.5 py-1"
           >
-            {running ? <Pause size={13} /> : <Play size={13} />}
+            {running ? <Pause size={12} /> : <Play size={12} />}
             {running ? "Pause" : "Start"}
           </button>
           <button onClick={reset} className="btn-secondary p-1.5">
-            <RotateCcw size={13} />
+            <RotateCcw size={12} />
           </button>
         </div>
       )}
@@ -134,14 +135,18 @@ function ClockTimer({
 
 function PomodoroTimer({
   active,
-  compact,
+  ringClass,
+  textClass,
   grayed,
   onActivate,
+  compact,
 }: {
   active: boolean;
-  compact?: boolean;
+  ringClass: string;
+  textClass: string;
   grayed?: boolean;
   onActivate?: () => void;
+  compact?: boolean;
 }) {
   const [focusMins, setFocusMins] = useState(25);
   const [breakMins, setBreakMins] = useState(5);
@@ -192,7 +197,7 @@ function PomodoroTimer({
   const progress = 1 - timeLeft / totalForPhase;
 
   const wrapClass = grayed
-    ? "opacity-40 pointer-events-none cursor-pointer"
+    ? "opacity-40 cursor-pointer"
     : "";
 
   return (
@@ -200,22 +205,22 @@ function PomodoroTimer({
       className={cn("flex flex-col items-center", wrapClass)}
       onClick={grayed ? onActivate : undefined}
     >
-      <div className="flex items-center gap-2 mb-2">
+      <div className="flex items-center gap-2 mb-1">
         <p className="label-caps text-[10px]">Pomodoro</p>
         {active && !compact && (
           <button
             onClick={() => setShowSettings((s) => !s)}
             className="text-muted hover:text-charcoal transition-colors"
           >
-            <Settings size={12} />
+            <Settings size={11} />
           </button>
         )}
       </div>
 
       {showSettings && active && (
-        <div className="flex gap-3 mb-2 text-xs">
+        <div className="flex gap-2 mb-1 text-[11px]">
           <label className="flex items-center gap-1 text-muted">
-            Focus
+            F
             <input
               type="number"
               min={1}
@@ -226,12 +231,11 @@ function PomodoroTimer({
                 setFocusMins(v);
                 if (phase === "focus" && !running) setTimeLeft(v * 60);
               }}
-              className="input-base w-12 text-center py-0.5"
+              className="input-base w-10 text-center py-0.5 text-[11px]"
             />
-            m
           </label>
           <label className="flex items-center gap-1 text-muted">
-            Break
+            B
             <input
               type="number"
               min={1}
@@ -242,38 +246,37 @@ function PomodoroTimer({
                 setBreakMins(v);
                 if (phase === "break" && !running) setTimeLeft(v * 60);
               }}
-              className="input-base w-12 text-center py-0.5"
+              className="input-base w-10 text-center py-0.5 text-[11px]"
             />
-            m
           </label>
         </div>
       )}
 
       <div className="relative">
-        <TimerRing progress={progress} compact={compact} />
+        <TimerRing progress={progress} ringClass={ringClass} />
         <span
           className={cn(
             "absolute inset-0 flex flex-col items-center justify-center font-serif text-charcoal tabular-nums",
-            compact ? "text-3xl" : "text-4xl"
+            textClass
           )}
         >
           {formatTime(timeLeft)}
-          <span className="text-[10px] text-muted font-sans capitalize mt-0.5">
+          <span className="text-[9px] text-muted font-sans capitalize">
             {phase}
           </span>
         </span>
       </div>
       {active && (
-        <div className="flex gap-2 mt-3">
+        <div className="flex gap-2 mt-2">
           <button
             onClick={() => setRunning((r) => !r)}
-            className="btn-primary flex items-center gap-1.5 text-xs px-3 py-1.5"
+            className="btn-primary flex items-center gap-1 text-xs px-2.5 py-1"
           >
-            {running ? <Pause size={13} /> : <Play size={13} />}
+            {running ? <Pause size={12} /> : <Play size={12} />}
             {running ? "Pause" : "Start"}
           </button>
           <button onClick={reset} className="btn-secondary p-1.5">
-            <RotateCcw size={13} />
+            <RotateCcw size={12} />
           </button>
         </div>
       )}
@@ -287,7 +290,7 @@ export default function StudyTimer({ size }: StudyTimerProps) {
   if (size === "small") {
     return (
       <div className="card flex flex-col items-center h-full">
-        <div className="flex items-center gap-2 mb-3 w-full">
+        <div className="flex items-center gap-2 mb-2 w-full shrink-0">
           <p className="label-caps text-xs flex-1">Study Timer</p>
           <div className="flex bg-parchment-dark rounded-lg p-0.5">
             {(["clock", "pomodoro"] as const).map((m) => (
@@ -295,7 +298,7 @@ export default function StudyTimer({ size }: StudyTimerProps) {
                 key={m}
                 onClick={() => setActiveMode(m)}
                 className={cn(
-                  "px-2.5 py-1 rounded-md text-[11px] font-medium transition-colors capitalize",
+                  "px-2 py-0.5 rounded-md text-[10px] font-medium transition-colors capitalize",
                   activeMode === m
                     ? "bg-white text-charcoal shadow-card"
                     : "text-muted hover:text-charcoal"
@@ -306,11 +309,11 @@ export default function StudyTimer({ size }: StudyTimerProps) {
             ))}
           </div>
         </div>
-        <div className="flex-1 flex items-center justify-center">
+        <div className="flex-1 flex items-center justify-center min-h-0">
           {activeMode === "clock" ? (
-            <ClockTimer active compact />
+            <ClockTimer active ringClass="w-[80px] h-[80px]" textClass="text-xl" />
           ) : (
-            <PomodoroTimer active compact />
+            <PomodoroTimer active compact ringClass="w-[80px] h-[80px]" textClass="text-xl" />
           )}
         </div>
       </div>
@@ -320,18 +323,22 @@ export default function StudyTimer({ size }: StudyTimerProps) {
   // Medium: side-by-side, inactive is grayed
   return (
     <div className="card flex flex-col h-full">
-      <p className="label-caps mb-4">Study Timer</p>
-      <div className="flex-1 flex items-center justify-center gap-6">
+      <p className="label-caps mb-2 shrink-0">Study Timer</p>
+      <div className="flex-1 flex items-center justify-center gap-4 min-h-0">
         <ClockTimer
           active={activeMode === "clock"}
           grayed={activeMode !== "clock"}
           onActivate={() => setActiveMode("clock")}
+          ringClass="w-[100px] h-[100px]"
+          textClass="text-2xl"
         />
-        <div className="w-px h-3/4 bg-border" />
+        <div className="w-px h-2/3 bg-border shrink-0" />
         <PomodoroTimer
           active={activeMode === "pomodoro"}
           grayed={activeMode !== "pomodoro"}
           onActivate={() => setActiveMode("pomodoro")}
+          ringClass="w-[100px] h-[100px]"
+          textClass="text-2xl"
         />
       </div>
     </div>

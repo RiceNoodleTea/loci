@@ -47,32 +47,36 @@ export default function DashboardPage() {
   return (
     <AssessmentProvider>
       <div className="flex flex-col h-[calc(100vh-56px-2rem)] md:h-[calc(100vh-56px-3rem)] overflow-hidden">
-        <div className="shrink-0">
+        <div className="shrink-0 mb-3">
           <HeroBanner userName="Scholar" />
         </div>
 
-        <div className="flex-1 grid grid-rows-2 gap-4 mt-4 min-h-0">
+        <div className="flex-1 flex flex-col gap-3 min-h-0">
           {/* Row 1: two 1/2 slots */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 min-h-0">
-            <WidgetSlot
-              slotId="row1-left"
-              layout={layout}
-              isCustomizing={isCustomizing}
-              onRemove={handleRemove}
-              onAdd={handleAdd}
-            />
-            <WidgetSlot
-              slotId="row1-right"
-              layout={layout}
-              isCustomizing={isCustomizing}
-              onRemove={handleRemove}
-              onAdd={handleAdd}
-            />
+          <div className="flex-1 grid grid-cols-1 lg:grid-cols-2 gap-3 min-h-0">
+            <div className="overflow-hidden min-h-0">
+              <WidgetSlot
+                slotId="row1-left"
+                layout={layout}
+                isCustomizing={isCustomizing}
+                onRemove={handleRemove}
+                onAdd={handleAdd}
+              />
+            </div>
+            <div className="overflow-hidden min-h-0">
+              <WidgetSlot
+                slotId="row1-right"
+                layout={layout}
+                isCustomizing={isCustomizing}
+                onRemove={handleRemove}
+                onAdd={handleAdd}
+              />
+            </div>
           </div>
 
           {/* Row 2: 2/3 + 1/3 slots */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 min-h-0">
-            <div className="lg:col-span-8">
+          <div className="flex-1 grid grid-cols-1 lg:grid-cols-12 gap-3 min-h-0">
+            <div className="lg:col-span-8 overflow-hidden min-h-0">
               <WidgetSlot
                 slotId="row2-left"
                 layout={layout}
@@ -81,7 +85,7 @@ export default function DashboardPage() {
                 onAdd={handleAdd}
               />
             </div>
-            <div className="lg:col-span-4">
+            <div className="lg:col-span-4 overflow-hidden min-h-0">
               <WidgetSlot
                 slotId="row2-right"
                 layout={layout}
@@ -93,7 +97,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* FAB: customize toggle */}
         <button
           onClick={() => setIsCustomizing((c) => !c)}
           className={`fixed bottom-6 right-6 w-14 h-14 rounded-full shadow-lg flex items-center justify-center transition-colors z-50 ${

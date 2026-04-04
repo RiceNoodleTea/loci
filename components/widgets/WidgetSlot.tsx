@@ -61,7 +61,7 @@ export default function WidgetSlot({
 
   if (!widgetId) {
     return (
-      <div className="relative h-full">
+      <div className="relative h-full overflow-hidden">
         <div className="card h-full flex items-center justify-center border-2 border-dashed border-border">
           {isCustomizing ? (
             <button
@@ -92,13 +92,13 @@ export default function WidgetSlot({
   }
 
   return (
-    <div className="relative h-full">
+    <div className="relative h-full overflow-hidden">
       {renderWidget(widgetId, size)}
       {isCustomizing && (
         <button
           onClick={() => onRemove(slotId)}
           className={cn(
-            "absolute bottom-3 right-3 z-10",
+            "absolute bottom-3 left-1/2 -translate-x-1/2 z-10",
             "w-8 h-8 rounded-full bg-red-500 text-white shadow-lg",
             "flex items-center justify-center",
             "hover:bg-red-600 transition-colors",

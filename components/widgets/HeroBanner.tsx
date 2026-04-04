@@ -15,7 +15,7 @@ export default function HeroBanner({ userName }: HeroBannerProps) {
 
   return (
     <div
-      className="relative min-h-[160px] rounded-2xl overflow-hidden flex items-end p-6 md:p-8"
+      className="relative rounded-2xl overflow-hidden flex items-end p-4 md:p-5"
       style={{
         background:
           "linear-gradient(135deg, #2D2D2D 0%, #3E3529 30%, #4A3F2F 50%, #3B3326 70%, #2D2D2D 100%)",
@@ -43,12 +43,9 @@ export default function HeroBanner({ userName }: HeroBannerProps) {
         <p className="text-white/50 text-sm tracking-wide mb-1">
           {formattedDate}
         </p>
-        <h1 className="text-2xl md:text-3xl font-serif font-bold text-white">
+        <h1 className="text-xl md:text-2xl font-serif font-bold text-white">
           Welcome back, {userName}
         </h1>
-        <p className="text-white/40 text-sm mt-1">
-          Continue where you left off
-        </p>
       </div>
     </div>
   );

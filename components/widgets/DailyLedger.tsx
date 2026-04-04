@@ -24,7 +24,7 @@ const INITIAL_ITEMS: LedgerItem[] = [
 
 function CheckIcon({ checked }: { checked: boolean }) {
   return (
-    <span className="relative flex-shrink-0 w-[16px] h-[16px]">
+    <span className="relative flex-shrink-0 w-[14px] h-[14px]">
       <span
         className={cn(
           "absolute inset-0 rounded border-2 transition-colors",
@@ -88,82 +88,23 @@ export default function DailyLedger({ size }: DailyLedgerProps) {
   };
 
   const completed = items.filter((i) => i.completed).length;
-  const maxVisible = size === "small" ? 4 : size === "medium" ? 6 : 8;
-  const visibleItems = items.slice(0, maxVisible);
 
   if (size === "small") {
     return (
       <div className="card flex flex-col h-full">
-        <div className="flex items-center justify-between mb-2">
-          <h2 className="text-sm font-serif font-semibold text-charcoal">
+        <div className="flex items-center justify-between mb-1.5 shrink-0">
+          <h2 className="text-xs font-serif font-semibold text-charcoal">
             Daily Ledger
           </h2>
           <span className="text-[10px] text-muted">
             {completed}/{items.length}
           </span>
         </div>
-        <div className="flex-1 space-y-0.5 overflow-hidden">
-          {visibleItems.map((item) => (
+        <div className="flex-1 space-y-0.5 overflow-y-auto min-h-0">
+          {items.map((item) => (
             <label
               key={item.id}
               className="flex items-center gap-2 px-1 py-1 rounded hover:bg-parchment/60 cursor-pointer group"
-            >
-              <CheckIcon checked={item.completed} />
-              <span
-                className={cn(
-                  "text-xs truncate",
-                  item.completed ? "line-through text-muted" : "text-charcoal"
-                )}
-              >
-                <input
-                  type="checkbox"
-                  checked={item.completed}
-                  onChange={() => toggle(item.id)}
-                  className="sr-only"
-                />
-                {item.text}
-              </span>
-            </label>
-          ))}
-        </div>
-        <button
-          onClick={openInput}
-          className="btn-ghost flex items-center gap-1 mt-1 text-xs self-start"
-        >
-          <Plus size={12} />
-        </button>
-        {isAdding && (
-          <div className="flex gap-1 mt-1">
-            <input
-              ref={inputRef}
-              value={newText}
-              onChange={(e) => setNewText(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="New task…"
-              className="input-base flex-1 text-xs py-1"
-            />
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  if (size === "large") {
-    return (
-      <div className="card flex flex-col h-full">
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-base font-serif font-semibold text-charcoal">
-            Daily Ledger
-          </h2>
-          <span className="text-xs text-muted">
-            {completed}/{items.length} done
-          </span>
-        </div>
-        <div className="flex-1 space-y-1 overflow-y-auto">
-          {visibleItems.map((item) => (
-            <label
-              key={item.id}
-              className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-parchment/60 cursor-pointer group"
             >
               <CheckIcon checked={item.completed} />
               <input
@@ -174,21 +115,80 @@ export default function DailyLedger({ size }: DailyLedgerProps) {
               />
               <span
                 className={cn(
-                  "font-serif text-sm flex-1",
+                  "text-[11px] truncate",
+                  item.completed ? "line-through text-muted" : "text-charcoal"
+                )}
+              >
+                {item.text}
+              </span>
+            </label>
+          ))}
+        </div>
+        {isAdding ? (
+          <div className="flex gap-1 mt-1 shrink-0">
+            <input
+              ref={inputRef}
+              value={newText}
+              onChange={(e) => setNewText(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="New task…"
+              className="input-base flex-1 text-[11px] py-0.5"
+            />
+          </div>
+        ) : (
+          <button
+            onClick={openInput}
+            className="btn-ghost flex items-center gap-1 mt-1 text-[11px] self-start shrink-0"
+          >
+            <Plus size={10} />
+            Add
+          </button>
+        )}
+      </div>
+    );
+  }
+
+  if (size === "large") {
+    return (
+      <div className="card flex flex-col h-full">
+        <div className="flex items-center justify-between mb-2 shrink-0">
+          <h2 className="text-sm font-serif font-semibold text-charcoal">
+            Daily Ledger
+          </h2>
+          <span className="text-xs text-muted">
+            {completed}/{items.length} done
+          </span>
+        </div>
+        <div className="flex-1 space-y-0.5 overflow-y-auto min-h-0">
+          {items.map((item) => (
+            <label
+              key={item.id}
+              className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-parchment/60 cursor-pointer group"
+            >
+              <CheckIcon checked={item.completed} />
+              <input
+                type="checkbox"
+                checked={item.completed}
+                onChange={() => toggle(item.id)}
+                className="sr-only"
+              />
+              <span
+                className={cn(
+                  "font-serif text-sm flex-1 truncate",
                   item.completed ? "line-through text-muted" : "text-charcoal"
                 )}
               >
                 {item.text}
               </span>
               {item.category && (
-                <span className="text-[10px] text-muted bg-parchment-dark rounded px-1.5 py-0.5 shrink-0">
+                <span className="text-[9px] text-muted bg-parchment-dark rounded px-1.5 py-0.5 shrink-0">
                   {item.category}
                 </span>
               )}
             </label>
           ))}
         </div>
-        <div className="flex gap-2 mt-3">
+        <div className="flex gap-2 mt-2 shrink-0">
           <input
             ref={inputRef}
             value={newText}
@@ -196,10 +196,10 @@ export default function DailyLedger({ size }: DailyLedgerProps) {
             onKeyDown={handleKeyDown}
             onFocus={() => setIsAdding(true)}
             placeholder="Add new task…"
-            className="input-base flex-1 text-sm"
+            className="input-base flex-1 text-xs"
           />
           {newText.trim() && (
-            <button onClick={addItem} className="btn-primary text-sm px-3">
+            <button onClick={addItem} className="btn-primary text-xs px-3">
               Add
             </button>
           )}
@@ -208,22 +208,22 @@ export default function DailyLedger({ size }: DailyLedgerProps) {
     );
   }
 
-  // Medium (default, matches original)
+  // Medium
   return (
     <div className="card flex flex-col h-full">
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-base font-serif font-semibold text-charcoal">
+      <div className="flex items-center justify-between mb-2 shrink-0">
+        <h2 className="text-sm font-serif font-semibold text-charcoal">
           Daily Ledger
         </h2>
         <span className="text-xs text-muted">
           {completed}/{items.length} done
         </span>
       </div>
-      <div className="flex-1 space-y-1 overflow-y-auto">
-        {visibleItems.map((item) => (
+      <div className="flex-1 space-y-0.5 overflow-y-auto min-h-0">
+        {items.map((item) => (
           <label
             key={item.id}
-            className="flex items-center gap-3 px-2 py-2 rounded-lg hover:bg-parchment/60 cursor-pointer group"
+            className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-parchment/60 cursor-pointer group"
           >
             <CheckIcon checked={item.completed} />
             <input
@@ -234,7 +234,7 @@ export default function DailyLedger({ size }: DailyLedgerProps) {
             />
             <span
               className={cn(
-                "font-serif text-sm",
+                "font-serif text-sm truncate",
                 item.completed ? "line-through text-muted" : "text-charcoal"
               )}
             >
@@ -244,25 +244,25 @@ export default function DailyLedger({ size }: DailyLedgerProps) {
         ))}
       </div>
       {isAdding ? (
-        <div className="flex gap-2 mt-3">
+        <div className="flex gap-2 mt-2 shrink-0">
           <input
             ref={inputRef}
             value={newText}
             onChange={(e) => setNewText(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="New task…"
-            className="input-base flex-1 text-sm"
+            className="input-base flex-1 text-xs"
           />
-          <button onClick={addItem} className="btn-primary text-sm px-3">
+          <button onClick={addItem} className="btn-primary text-xs px-3">
             Add
           </button>
         </div>
       ) : (
         <button
           onClick={openInput}
-          className="btn-ghost flex items-center gap-1.5 mt-3 text-sm self-start"
+          className="btn-ghost flex items-center gap-1 mt-2 text-xs self-start shrink-0"
         >
-          <Plus size={14} />
+          <Plus size={12} />
           Add task
         </button>
       )}

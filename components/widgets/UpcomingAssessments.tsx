@@ -42,7 +42,7 @@ function AssessmentRow({
     <button
       onClick={onClick}
       className={cn(
-        "w-full text-left border-l-[3px] rounded-lg bg-parchment/60 px-3 py-2.5 flex items-start justify-between gap-2 hover:bg-parchment transition-colors",
+        "w-full text-left border-l-[3px] rounded-lg bg-parchment/60 px-3 py-2 flex items-start justify-between gap-2 hover:bg-parchment transition-colors",
         BORDER_COLORS[a.priority]
       )}
     >
@@ -86,42 +86,42 @@ function AssessmentDetail({
   const remaining = daysUntil(a.dueDate);
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full overflow-hidden">
       <button
         onClick={onClose}
-        className="flex items-center gap-1 text-sm text-muted hover:text-charcoal transition-colors mb-3 self-start"
+        className="flex items-center gap-1 text-sm text-muted hover:text-charcoal transition-colors mb-2 self-start shrink-0"
       >
         <ChevronLeft size={14} />
         Back
       </button>
-      <h3 className="font-serif font-bold text-lg text-charcoal mb-1">
+      <h3 className="font-serif font-bold text-base text-charcoal mb-1 shrink-0">
         {a.title}
       </h3>
-      <div className="space-y-2 text-sm flex-1">
-        <Row label="Date">
+      <div className="space-y-1.5 text-sm flex-1 overflow-y-auto min-h-0">
+        <DetailRow label="Date">
           {dateObj.toLocaleDateString("en-US", {
-            weekday: "long",
-            month: "long",
+            weekday: "short",
+            month: "short",
             day: "numeric",
             year: "numeric",
           })}
-        </Row>
-        <Row label="Time Until">
+        </DetailRow>
+        <DetailRow label="Time Until">
           {remaining > 0
             ? `${remaining} day${remaining !== 1 ? "s" : ""}`
             : remaining === 0
             ? "Today"
             : "Past due"}
-        </Row>
-        {a.location && <Row label="Location">{a.location}</Row>}
-        {a.subject && <Row label="Subject">{a.subject}</Row>}
-        {a.weighting && <Row label="Weighting">{a.weighting}</Row>}
+        </DetailRow>
+        {a.location && <DetailRow label="Location">{a.location}</DetailRow>}
+        {a.subject && <DetailRow label="Subject">{a.subject}</DetailRow>}
+        {a.weighting && <DetailRow label="Weight">{a.weighting}</DetailRow>}
         {a.notes && (
-          <div className="pt-2 border-t border-border">
-            <p className="text-xs text-muted uppercase tracking-wider font-semibold mb-1">
+          <div className="pt-1.5 border-t border-border">
+            <p className="text-[10px] text-muted uppercase tracking-wider font-semibold mb-0.5">
               Notes
             </p>
-            <p className="text-charcoal whitespace-pre-wrap">{a.notes}</p>
+            <p className="text-charcoal text-xs whitespace-pre-wrap">{a.notes}</p>
           </div>
         )}
       </div>
@@ -129,10 +129,10 @@ function AssessmentDetail({
   );
 }
 
-function Row({ label, children }: { label: string; children: React.ReactNode }) {
+function DetailRow({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex gap-2">
-      <span className="text-muted w-20 shrink-0">{label}</span>
+    <div className="flex gap-2 text-xs">
+      <span className="text-muted w-16 shrink-0">{label}</span>
       <span className="text-charcoal">{children}</span>
     </div>
   );
@@ -164,9 +164,9 @@ function CreateForm({ onClose }: { onClose: () => void }) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col h-full">
-      <div className="flex items-center justify-between mb-3">
-        <h3 className="font-serif font-semibold text-charcoal">
+    <form onSubmit={handleSubmit} className="flex flex-col h-full overflow-hidden">
+      <div className="flex items-center justify-between mb-2 shrink-0">
+        <h3 className="font-serif font-semibold text-sm text-charcoal">
           New Assessment
         </h3>
         <button
@@ -174,48 +174,48 @@ function CreateForm({ onClose }: { onClose: () => void }) {
           onClick={onClose}
           className="text-muted hover:text-charcoal"
         >
-          <X size={16} />
+          <X size={14} />
         </button>
       </div>
-      <div className="flex-1 space-y-2 overflow-y-auto">
+      <div className="flex-1 space-y-1.5 overflow-y-auto min-h-0">
         <input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Assessment name *"
-          className="input-base w-full text-sm"
+          className="input-base w-full text-xs"
           required
         />
         <input
           type="datetime-local"
           value={dueDate}
           onChange={(e) => setDueDate(e.target.value)}
-          className="input-base w-full text-sm"
+          className="input-base w-full text-xs"
           required
         />
         <input
           value={location}
           onChange={(e) => setLocation(e.target.value)}
           placeholder="Location"
-          className="input-base w-full text-sm"
+          className="input-base w-full text-xs"
         />
         <input
           value={subject}
           onChange={(e) => setSubject(e.target.value)}
           placeholder="Subject"
-          className="input-base w-full text-sm"
+          className="input-base w-full text-xs"
         />
         <input
           value={weighting}
           onChange={(e) => setWeighting(e.target.value)}
           placeholder="Weighting (e.g. 30%)"
-          className="input-base w-full text-sm"
+          className="input-base w-full text-xs"
         />
         <select
           value={priority}
           onChange={(e) =>
             setPriority(e.target.value as Assessment["priority"])
           }
-          className="input-base w-full text-sm"
+          className="input-base w-full text-xs"
         >
           <option value="low">Low Priority</option>
           <option value="medium">Medium Priority</option>
@@ -226,10 +226,10 @@ function CreateForm({ onClose }: { onClose: () => void }) {
           onChange={(e) => setNotes(e.target.value)}
           placeholder="Notes"
           rows={2}
-          className="input-base w-full text-sm resize-none"
+          className="input-base w-full text-xs resize-none"
         />
       </div>
-      <button type="submit" className="btn-primary text-sm mt-3 w-full">
+      <button type="submit" className="btn-primary text-xs mt-2 w-full shrink-0">
         Add Assessment
       </button>
     </form>
@@ -266,24 +266,24 @@ export default function UpcomingAssessments({ size }: UpcomingAssessmentsProps) 
 
   return (
     <div className="card flex flex-col h-full">
-      <div className="flex items-center justify-between mb-3">
-        <h2 className="text-base font-serif font-semibold text-charcoal">
+      <div className="flex items-center justify-between mb-2 shrink-0">
+        <h2 className="text-sm font-serif font-semibold text-charcoal">
           Upcoming Assessments
         </h2>
         <div className="flex items-center gap-2">
-          <span className="bg-olive text-white text-xs font-semibold rounded-full w-5 h-5 flex items-center justify-center">
+          <span className="bg-olive text-white text-[10px] font-semibold rounded-full w-5 h-5 flex items-center justify-center">
             {assessments.length}
           </span>
           <button
             onClick={() => setShowCreate(true)}
             className="text-olive hover:text-olive-hover transition-colors"
           >
-            <Plus size={18} />
+            <Plus size={16} />
           </button>
         </div>
       </div>
 
-      <div className="flex-1 space-y-2 overflow-y-auto">
+      <div className="flex-1 space-y-1.5 overflow-y-auto min-h-0">
         {sorted.map((a) => (
           <AssessmentRow
             key={a.id}
@@ -293,7 +293,7 @@ export default function UpcomingAssessments({ size }: UpcomingAssessmentsProps) 
           />
         ))}
         {sorted.length === 0 && (
-          <p className="text-sm text-muted text-center py-4">
+          <p className="text-xs text-muted text-center py-4">
             No upcoming assessments
           </p>
         )}

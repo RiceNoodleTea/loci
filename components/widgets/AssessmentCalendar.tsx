@@ -35,15 +35,15 @@ function DayDetail({
 }) {
   if (compact) {
     return (
-      <div className="absolute z-20 bg-white rounded-lg shadow-card-hover border border-border p-3 w-48 -translate-x-1/2 left-1/2 top-full mt-1">
+      <div className="absolute z-20 bg-white rounded-lg shadow-card-hover border border-border p-2 w-44 -translate-x-1/2 left-1/2 top-full mt-1">
         <div className="flex items-center justify-between mb-1">
-          <p className="text-xs font-semibold text-charcoal">{date}</p>
+          <p className="text-[10px] font-semibold text-charcoal">{date}</p>
           <button onClick={onClose} className="text-muted hover:text-charcoal">
-            <X size={12} />
+            <X size={10} />
           </button>
         </div>
         {assessments.map((a) => (
-          <p key={a.id} className="text-xs text-muted truncate">
+          <p key={a.id} className="text-[10px] text-muted truncate">
             {a.title}
           </p>
         ))}
@@ -52,26 +52,26 @@ function DayDetail({
   }
 
   return (
-    <div className="border-t border-border pt-3 mt-3">
-      <div className="flex items-center justify-between mb-2">
-        <p className="text-sm font-serif font-semibold text-charcoal">{date}</p>
+    <div className="border-t border-border pt-2 mt-2 shrink-0 overflow-y-auto max-h-[100px]">
+      <div className="flex items-center justify-between mb-1">
+        <p className="text-xs font-serif font-semibold text-charcoal">{date}</p>
         <button
           onClick={onClose}
           className="text-muted hover:text-charcoal transition-colors"
         >
-          <X size={14} />
+          <X size={12} />
         </button>
       </div>
-      <div className="space-y-2 overflow-y-auto max-h-[120px]">
+      <div className="space-y-1">
         {assessments.map((a) => {
           const remaining = daysUntil(a.dueDate);
           return (
             <div
               key={a.id}
-              className="bg-parchment/60 rounded-lg px-3 py-2 text-xs"
+              className="bg-parchment/60 rounded-lg px-2 py-1.5 text-[10px]"
             >
               <p className="font-semibold text-charcoal">{a.title}</p>
-              <p className="text-muted mt-0.5">
+              <p className="text-muted">
                 {remaining > 0
                   ? `${remaining}d left`
                   : remaining === 0
@@ -79,11 +79,7 @@ function DayDetail({
                   : "Past"}
                 {a.location && ` · ${a.location}`}
                 {a.subject && ` · ${a.subject}`}
-                {a.weighting && ` · ${a.weighting}`}
               </p>
-              {a.notes && (
-                <p className="text-muted mt-1 line-clamp-2">{a.notes}</p>
-              )}
             </div>
           );
         })}
@@ -106,7 +102,9 @@ export default function AssessmentCalendar({ size }: AssessmentCalendarProps) {
 
   const monthLabel = new Date(currentYear, currentMonth).toLocaleDateString(
     "en-US",
-    compact ? { month: "short", year: "numeric" } : { month: "long", year: "numeric" }
+    compact
+      ? { month: "short", year: "numeric" }
+      : { month: "long", year: "numeric" }
   );
 
   const assessmentsByDay = new Map<number, Assessment[]>();
@@ -148,17 +146,18 @@ export default function AssessmentCalendar({ size }: AssessmentCalendarProps) {
     <div key={`blank-${i}`} />
   ));
 
+  const cellSize = compact ? "w-5 h-5 text-[10px]" : "w-7 h-7 text-xs";
+
   const days = Array.from({ length: daysInMonth }, (_, i) => {
     const day = i + 1;
     const hasEvent = assessmentsByDay.has(day);
     const todayHighlight = isToday(day);
     const isSelected = selectedDay === day;
-    const cellSize = compact ? "w-6 h-6 text-[11px]" : "w-8 h-8 text-sm";
 
     return (
       <div
         key={day}
-        className="flex flex-col items-center justify-center py-0.5 relative"
+        className="flex flex-col items-center justify-center relative"
       >
         <button
           onClick={() => {
@@ -179,7 +178,7 @@ export default function AssessmentCalendar({ size }: AssessmentCalendarProps) {
           {day}
         </button>
         {hasEvent && (
-          <span className="w-1 h-1 rounded-full bg-olive mt-0.5" />
+          <span className="w-1 h-1 rounded-full bg-olive" />
         )}
         {isSelected && compact && assessmentsByDay.has(day) && (
           <DayDetail
@@ -200,11 +199,11 @@ export default function AssessmentCalendar({ size }: AssessmentCalendarProps) {
 
   return (
     <div className="card flex flex-col h-full">
-      <div className="flex items-center justify-between mb-3">
+      <div className="flex items-center justify-between mb-2 shrink-0">
         <h2
           className={cn(
             "font-serif font-semibold text-charcoal",
-            compact ? "text-sm" : "text-base"
+            compact ? "text-xs" : "text-sm"
           )}
         >
           Assessment Calendar
@@ -212,36 +211,36 @@ export default function AssessmentCalendar({ size }: AssessmentCalendarProps) {
         <div className="flex items-center gap-1">
           <button
             onClick={goToPrev}
-            className="btn-ghost p-1 rounded-lg"
+            className="btn-ghost p-0.5 rounded-lg"
             aria-label="Previous month"
           >
-            <ChevronLeft size={compact ? 14 : 16} />
+            <ChevronLeft size={compact ? 12 : 14} />
           </button>
           <span
             className={cn(
               "font-medium text-charcoal text-center",
-              compact ? "text-xs min-w-[80px]" : "text-sm min-w-[130px]"
+              compact ? "text-[10px] min-w-[60px]" : "text-xs min-w-[100px]"
             )}
           >
             {monthLabel}
           </span>
           <button
             onClick={goToNext}
-            className="btn-ghost p-1 rounded-lg"
+            className="btn-ghost p-0.5 rounded-lg"
             aria-label="Next month"
           >
-            <ChevronRight size={compact ? 14 : 16} />
+            <ChevronRight size={compact ? 12 : 14} />
           </button>
         </div>
       </div>
 
-      <div className="grid grid-cols-7 mb-1">
+      <div className="grid grid-cols-7 shrink-0">
         {headers.map((d, i) => (
           <div
             key={`${d}-${i}`}
             className={cn(
-              "text-center font-semibold uppercase tracking-wider text-muted py-0.5",
-              compact ? "text-[8px]" : "text-[10px]"
+              "text-center font-semibold uppercase tracking-wider text-muted",
+              compact ? "text-[7px] py-0" : "text-[9px] py-0.5"
             )}
           >
             {d}
@@ -249,12 +248,23 @@ export default function AssessmentCalendar({ size }: AssessmentCalendarProps) {
         ))}
       </div>
 
-      <div className="grid grid-cols-7">{blanks}{days}</div>
+      <div className="grid grid-cols-7 flex-1 min-h-0 overflow-hidden">
+        {blanks}
+        {days}
+      </div>
 
       {!compact && selectedAssessments && selectedDay && (
         <DayDetail
           assessments={selectedAssessments}
-          date={`${new Date(currentYear, currentMonth, selectedDay).toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" })}`}
+          date={new Date(
+            currentYear,
+            currentMonth,
+            selectedDay
+          ).toLocaleDateString("en-US", {
+            weekday: "short",
+            month: "short",
+            day: "numeric",
+          })}
           onClose={() => setSelectedDay(null)}
         />
       )}
